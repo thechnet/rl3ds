@@ -54,10 +54,23 @@ void setup()
   setupStorage();
   setupSensor();
   setupMotors();
+
+// #define CALIBRATION_MODE
+#ifdef CALIBRATION_MODE
+  /* Lower sensor. */ digitalWrite(PIN_DIR_TOWER, HIGH);
+  // /* Raise sensor. */ digitalWrite(PIN_DIR_TOWER, LOW);
+  for (int s = 0; s < 100 /* Number of steps to move per reset. */; ++s) {
+    digitalWrite(PIN_STEP_TOWER, HIGH);
+    delayMicroseconds(TOWER_STEP_HALF_DELAY_uS);
+    digitalWrite(PIN_STEP_TOWER, LOW);
+    delayMicroseconds(TOWER_STEP_HALF_DELAY_uS);
+  }
+#endif
 }
 
 void loop()
 {
+#ifndef CALIBRATION_MODE
   if (state == SCANNING) {
     showState();
     scan();
@@ -65,6 +78,7 @@ void loop()
 
   state = IDLE;
   showState();
+#endif
 }
 
 #ifndef ARDUINO
