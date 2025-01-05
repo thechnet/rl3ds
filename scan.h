@@ -11,7 +11,6 @@ Constants.
 #define TABLE_STOPS_PER_ROTATION 200
 #define TABLE_STOP_DELAY_MS 20 /* Also consider SENSOR_TIMING_BUDGET_MS in sensor.h. */
 #define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)14)
-#define MIN_RADIUS_CM ((double)0.01)
 
 #define TOWER_HEIGHT_CM ((double)15) /* The full height of the tower. (!) This is only used to calculate vertex coordinates. The physical size of the tower is given as TOWER_HEIGHT_IN_STEPS in motors.h. */
 #define TOWER_LIMIT_CM ((double)5) /* The (actual!) height limit of the scan. */
@@ -60,9 +59,8 @@ void advanceTableThenEmitVertex()
 
   double distance_cm = readDistance_mm() / 10;
   double radius_cm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM - distance_cm;
-  double normalizedRadius_cm = radius_cm < MIN_RADIUS_CM ? 0 : radius_cm;
-  double x = normalizedRadius_cm * cos(theta);
-  double y = normalizedRadius_cm * sin(theta);
+  double x = radius_cm * cos(theta);
+  double y = radius_cm * sin(theta);
 
   emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x, z, y);
 }
