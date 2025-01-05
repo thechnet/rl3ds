@@ -50,7 +50,7 @@ ArduinoLEDMatrix ledMatrix;
     { _, M, _, _, _, _, _, _, _, _, _, _ },
     { _, M, M, M, _, _, _, _, _, _, _, _ },
     { _, _, _, M, _, _, _, _, _, _, _, _ },
-    { _, M, M, M, _, _, _, _, _, _, _, _ },
+    { _, M, M, M, _, M, _, M, _, M, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
   };
@@ -60,17 +60,27 @@ ArduinoLEDMatrix ledMatrix;
     { _, M, _, M, _, _, _, _, _, _, _, _ },
     { _, M, M, _, _, _, _, _, _, _, _, _ },
     { _, M, _, M, _, _, _, _, _, _, _, _ },
-    { _, M, _, M, _, _, _, _, _, _, _, _ },
+    { _, M, _, M, _, M, _, M, _, M, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
   };
-  byte bitmapFailed[8][12] = {
+  byte bitmapFailSD[8][12] = {
     { _, _, _, _, _, _, _, _, _, _, _, _ },
-    { _, M, M, M, _, _, _, _, _, _, _, _ },
-    { _, M, _, _, _, _, _, _, _, _, _, _ },
-    { _, M, M, M, _, _, _, _, _, _, _, _ },
-    { _, M, _, _, _, _, _, _, _, _, _, _ },
-    { _, M, _, _, _, _, _, _, _, _, _, _ },
+    { _, M, M, M, _, M, M, _, _, M, _, _ },
+    { _, M, _, _, _, M, _, M, _, M, _, _ },
+    { _, M, M, M, _, M, _, M, _, M, _, _ },
+    { _, _, _, M, _, M, _, M, _, _, _, _ },
+    { _, M, M, M, _, M, M, _, _, M, _, _ },
+    { _, _, _, _, _, _, _, _, _, _, _, _ },
+    { _, _, _, _, _, _, _, _, _, _, _, _ },
+  };
+  byte bitmapFailSensor[8][12] = {
+    { _, _, _, _, _, _, _, _, _, _, _, _ },
+    { _, M, M, _, _, M, M, M, _, M, _, _ },
+    { _, M, _, M, _, M, _, _, _, M, _, _ },
+    { _, M, _, M, _, M, M, M, _, M, _, _ },
+    { _, M, _, M, _, _, _, M, _, _, _, _ },
+    { _, M, M, _, _, M, M, M, _, M, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
     { _, _, _, _, _, _, _, _, _, _, _, _ },
   };
@@ -99,10 +109,11 @@ void showState()
 {
   byte (*bitmap)[12];
   switch (state) {
-  case IDLE:      bitmap = bitmapIdle;      break;
-  case SCANNING:  bitmap = bitmapScanning;  break;
-  case RESETTING: bitmap = bitmapResetting; break;
-  case FAILED:    bitmap = bitmapFailed;    break;
+  case IDLE:        bitmap = bitmapIdle;       break;
+  case SCANNING:    bitmap = bitmapScanning;   break;
+  case RESETTING:   bitmap = bitmapResetting;  break;
+  case FAIL_SD:     bitmap = bitmapFailSD;     break;
+  case FAIL_SENSOR: bitmap = bitmapFailSensor; break;
   }
 #ifdef ARDUINO
   ledMatrix.renderBitmap(bitmap, 8, 12);

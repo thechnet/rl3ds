@@ -14,7 +14,7 @@ Dependencies.
 Globals.
 */
 
-volatile enum { IDLE, SCANNING, RESETTING, FAILED } state;
+volatile enum state { IDLE, SCANNING, RESETTING, FAIL_SD, FAIL_SENSOR } state;
 
 /*
 Functions.
@@ -33,9 +33,9 @@ void delay(int ms)
 }
 #endif
 
-void fail()
+void fail(enum state s)
 {
-  state = FAILED;
+  state = s;
   showState();
   while (true);
 }

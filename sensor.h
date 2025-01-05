@@ -42,7 +42,7 @@ void setupSensor()
   distanceSensor.setTimeout(500); /* The maximum number of milliseconds to stall in case of a sensor failure. */
   if (!distanceSensor.init()) {
     log("Cannot initialize distance sensor!\n");
-    fail();
+    fail(FAIL_SENSOR);
   }
   distanceSensor.setDistanceMode(VL53L1X::Short); /* Short mode tests up to 1.3 m. */
   distanceSensor.setMeasurementTimingBudget(SENSOR_TIMING_BUDGET_MS * 1000 /* microseconds */);

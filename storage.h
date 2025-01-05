@@ -32,7 +32,7 @@ void setupStorage()
 #ifdef ARDUINO
   if (!SD.begin(PIN_SD)) {
     log("Cannot initialize SD card!\n");
-    fail();
+    fail(FAIL_SD);
   }
 #endif
 }
@@ -42,12 +42,12 @@ void openResultFile()
 #ifdef ARDUINO
   if (!SD.remove(RESULT_FILE_NAME)) {
     log("Cannot delete %s!\n", RESULT_FILE_NAME);
-    fail();
+    fail(FAIL_SD);
   }
   resultFile = SD.open(RESULT_FILE_NAME, FILE_WRITE);
   if (!resultFile) {
     log("Cannot open %s!\n", RESULT_FILE_NAME);
-    fail();
+    fail(FAIL_SD);
   }
 #endif
 }
