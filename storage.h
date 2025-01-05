@@ -3,7 +3,9 @@ Dependencies.
 */
 
 #ifdef ARDUINO
+#include <SPI.h>
 #include <SD.h>
+#include "pins_arduino.h" /* SS_PIN. */
 #else
 #include <stdio.h>
 #endif
@@ -30,6 +32,9 @@ Functions.
 void setupStorage()
 {
 #ifdef ARDUINO
+  pinMode(SS_PIN, OUTPUT); /* See SD documentation. */
+  // pinMode(PIN_SD, OUTPUT); // FIXME: Is this required?
+
   if (!SD.begin(PIN_SD)) {
     log("Cannot initialize SD card!\n");
     fail(FAIL_SD);
@@ -40,7 +45,7 @@ void setupStorage()
 void openResultFile()
 {
 #ifdef ARDUINO
-  if (!SD.remove(RESULT_FILE_NAME)) {
+  if (SD.exists(RESULT_FILE_NAME) && !SD.remove(RESULT_FILE_NAME)) {
     log("Cannot delete %s!\n", RESULT_FILE_NAME);
     fail(FAIL_SD);
   }
