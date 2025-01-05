@@ -8,13 +8,16 @@ Dependencies.
 Constants.
 */
 
-#define TABLE_STOPS_PER_ROTATION 10
-#define TABLE_STOP_DELAY_MS 50
-#define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)10)
+#define TABLE_STOPS_PER_ROTATION 200
+#define TABLE_STOP_DELAY_MS 20 /* Also consider SENSOR_TIMING_BUDGET_MS in sensor.h. */
+#define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)14)
 #define MIN_RADIUS_CM ((double)0.01)
 
-#define TOWER_HEIGHT_CM ((double)15) /* (!) This is only used in the vertex coordinates! See motors.h for defining the height of the tower in motor steps. */
-#define TOWER_STOPS 15 /* (!) How often the sensor moves up during a scan. The number of scanned disks is one larger. */
+#define TOWER_HEIGHT_CM ((double)15) /* The full height of the tower. (!) This is only used to calculate vertex coordinates. The physical size of the tower is given as TOWER_HEIGHT_IN_STEPS in motors.h. */
+#define TOWER_LIMIT_CM ((double)5) /* The (actual!) height limit of the scan. */
+static_assert(TOWER_LIMIT_CM <= TOWER_HEIGHT_CM);
+#define TOWER_HEIGHT_STOPS 25 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
+#define TOWER_LIMIT_STOPS ((int)(TOWER_HEIGHT_STOPS * TOWER_LIMIT_CM / TOWER_HEIGHT_CM))
 #define TOWER_LOWER_DELAY_PER_STOP_MS 0
 
 #undef M_PI
@@ -53,7 +56,7 @@ void advanceTableThenEmitVertex()
   /* Emit vertex. */
 
   double theta = M_PI * 2 * numberOfVisitedTableStopsInThisRotation / TABLE_STOPS_PER_ROTATION;
-  double z = TOWER_HEIGHT_CM * numberOfCompletedTowerStops / TOWER_STOPS;
+  double z = TOWER_LIMIT_CM * numberOfCompletedTowerStops / TOWER_LIMIT_STOPS;
 
   double distance_cm = readDistance_mm() / 10;
   double radius_cm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM - distance_cm;
@@ -98,7 +101,7 @@ void scan()
   numberOfCompletedTowerStops = 0;
   while (true) {
     rotateThenEmitFaces();
-    if (numberOfCompletedTowerStops++ >= TOWER_STOPS || state != SCANNING)
+    if (numberOfCompletedTowerStops++ >= TOWER_LIMIT_STOPS || state != SCANNING)
       break;
     towerMotorAdvanceToNextStop();
   }
