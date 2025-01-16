@@ -25,10 +25,13 @@ Functions.
 #ifndef ARDUINO
 void delay(int ms)
 {
+// #define USE_ARTIFICIAL_DELAY
+#ifdef USE_ARTIFICIAL_DELAY
 #ifdef WIN32
   Sleep(ms);
 #else
   usleep(ms * 1000 /* microseconds */ );
+#endif
 #endif
 }
 #endif
