@@ -56,7 +56,7 @@ double readDistance_mm()
 {
 #ifdef USE_VL53L1X
   distanceSensor.read(); /* Fetch the latest measurement. */
-  double distance_mm = distanceSensor.ranging_data.range_mm;
+  double distance_mm = distanceSensor.ranging_data.range_status == VL53L1_RANGESTATUS_RANGE_VALID ? distanceSensor.ranging_data.range_mm : INFINITY;
   // log("%.2f (%s)\n", distance_mm, VL53L1X::rangeStatusToString(distanceSensor.ranging_data.range_status));
 #else
   double distance_mm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM * 10 / 2 + (-5 + ((double)rand() / RAND_MAX) * TABLE_CENTER_DISTANCE_FROM_SENSOR_CM * 10 / 20);
