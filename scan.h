@@ -70,11 +70,8 @@ void rotateThenEmitFaces()
   /* Rotate. */
 
   numberOfVisitedTableStopsInThisRotation = 0;
-  for (int s = 0; s < TABLE_STOPS_PER_ROTATION; ++s) {
-    if (state != SCANNING)
-      return;
+  for (int s = 0; s < TABLE_STOPS_PER_ROTATION; ++s)
     advanceTableThenEmitVertex();
-  }
 
   if (numberOfCompletedTowerStops < 1) /* If this is the first disk we can't form any faces yet. */
     return;
