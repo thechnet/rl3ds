@@ -8,14 +8,17 @@ Dependencies.
 Constants.
 */
 
-#define TABLE_STOPS_PER_ROTATION 200
+#define MODEL_POINT_CLOUD
+#define POINT_CLOUD_POINT_SIZE_CM ((double)0.25)
+
+#define TABLE_STOPS_PER_ROTATION 50
 #define TABLE_STOP_DELAY_MS 20 /* Also consider SENSOR_TIMING_BUDGET_MS in sensor.h. */
 #define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)14)
 
 #define TOWER_HEIGHT_CM ((double)15) /* The full height of the tower. (!) This is only used to calculate vertex coordinates. The physical size of the tower is given as TOWER_HEIGHT_IN_STEPS in motors.h. */
-#define TOWER_LIMIT_CM ((double)5) /* The (actual!) height limit of the scan. */
+#define TOWER_LIMIT_CM ((double)15) /* The (actual!) height limit of the scan. */
 static_assert(TOWER_LIMIT_CM <= TOWER_HEIGHT_CM);
-#define TOWER_HEIGHT_STOPS 25 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
+#define TOWER_HEIGHT_STOPS 30 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
 #define TOWER_LIMIT_STOPS ((int)(TOWER_HEIGHT_STOPS * TOWER_LIMIT_CM / TOWER_HEIGHT_CM))
 #define TOWER_LOWER_DELAY_PER_STOP_MS 0
 
@@ -55,14 +58,47 @@ void advanceTableThenEmitVertex()
   /* Emit vertex. */
 
   double theta = M_PI * 2 * numberOfVisitedTableStopsInThisRotation / TABLE_STOPS_PER_ROTATION;
-  double z = TOWER_LIMIT_CM * numberOfCompletedTowerStops / TOWER_LIMIT_STOPS;
+  double y = TOWER_LIMIT_CM * numberOfCompletedTowerStops / TOWER_LIMIT_STOPS;
 
   double distance_cm = readDistance_mm() / 10;
-  double radius_cm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM - distance_cm;
+  double radius_cm = distance_cm - TABLE_CENTER_DISTANCE_FROM_SENSOR_CM;
   double x = radius_cm * cos(theta);
-  double y = radius_cm * sin(theta);
+  double z = radius_cm * sin(theta);
 
+#ifdef MODEL_POINT_CLOUD
+  /* We need a better solution for this if we're not using the point cloud algorithm. */
+  if (isinf(distance_cm))
+    return;
+
+  double inradius = POINT_CLOUD_POINT_SIZE_CM * sin(M_PI / 6);
+  double halfEdgeLength = POINT_CLOUD_POINT_SIZE_CM * cos(M_PI / 6);
+
+  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x - inradius, y - inradius, z - halfEdgeLength);
+  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x - inradius, y - inradius, z + halfEdgeLength);
+  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x + POINT_CLOUD_POINT_SIZE_CM, y - inradius, z);
+  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x, y + POINT_CLOUD_POINT_SIZE_CM, z);
+
+  int firstNewVertex = 1 /* The vertex numbers start at 1. */
+                     + 4 /* The number of vertices per tetrahedron. */
+                     * (
+                       TABLE_STOPS_PER_ROTATION
+                       * numberOfCompletedTowerStops
+                       + numberOfVisitedTableStopsInThisRotation
+                       - 1 /* We already incremented this above. */
+                     );
+
+  /* Floor. */
+  emit("f %d %d %d\n", firstNewVertex, firstNewVertex + 1, firstNewVertex + 2);
+
+  /* Upright sides. */
+  emit("f %d %d %d\n", firstNewVertex, firstNewVertex + 1, firstNewVertex + 3);
+  emit("f %d %d %d\n", firstNewVertex, firstNewVertex + 2, firstNewVertex + 3);
+  
+  /* Slanted side. */
+  emit("f %d %d %d\n", firstNewVertex + 1, firstNewVertex + 2, firstNewVertex + 3);
+#else
   emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x, z, y);
+#endif
 }
 
 void rotateThenEmitFaces()
@@ -76,6 +112,7 @@ void rotateThenEmitFaces()
   if (numberOfCompletedTowerStops < 1) /* If this is the first disk we can't form any faces yet. */
     return;
 
+#ifndef MODEL_POINT_CLOUD
   /* Emit faces. */
 
   int firstUpperVertex = 1 + TABLE_STOPS_PER_ROTATION * numberOfCompletedTowerStops;
@@ -86,6 +123,7 @@ void rotateThenEmitFaces()
     emit("f %d %d %d\n", firstLowerVertex + i, firstLowerVertex + iPlus1, firstUpperVertex + i);
     emit("f %d %d %d\n", firstUpperVertex + i, firstLowerVertex + iPlus1, firstUpperVertex + iPlus1);
   }
+#endif
 }
 
 void scan()
