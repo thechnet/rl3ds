@@ -10,6 +10,8 @@ Dependencies.
 #include <stdio.h>
 #endif
 
+// #define NO_SD
+
 /*
 Constants.
 */
@@ -31,7 +33,7 @@ Functions.
 
 void setupStorage()
 {
-#ifdef ARDUINO
+#if defined(ARDUINO) && !defined(NO_SD)
   pinMode(SS_PIN, OUTPUT); /* See SD documentation. */
   // pinMode(PIN_SD, OUTPUT); // FIXME: Is this required?
 
@@ -44,7 +46,7 @@ void setupStorage()
 
 void openResultFile()
 {
-#ifdef ARDUINO
+#if defined(ARDUINO) && !defined(NO_SD)
   if (SD.exists(RESULT_FILE_NAME) && !SD.remove(RESULT_FILE_NAME)) {
     log("Cannot delete %s!\n", RESULT_FILE_NAME);
     fail(FAIL_SD);
@@ -59,7 +61,7 @@ void openResultFile()
 
 void closeResultFile()
 {
-#ifdef ARDUINO
+#if defined(ARDUINO) && !defined(NO_SD)
   resultFile.close();
 #endif
 }
@@ -72,9 +74,11 @@ void emit(const char *format, ...)
   vsnprintf(text, sizeof(text), format, args);
   va_end(args);
 #ifdef ARDUINO
+#ifndef NO_SD
   resultFile.print(text);
+#endif
 #else
   printf("%s", text);
 #endif
-  log(text);
+  // log(text);
 }
