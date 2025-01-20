@@ -125,6 +125,11 @@ void rotateThenEmitFaces()
 
 void scan()
 {
+  /* Allow the sensor to settle. */
+  for (int i = 0; i < 5; ++i) {
+    readDistance_mm();
+  }
+
   openResultFile();
 
   towerMotorSetRotationDirection(false);
