@@ -4,6 +4,14 @@
 #endif
 
 /*
+While using this, change the following values to match the configuration used to collect the distances:
+- set TABLE_STEPS_PER_ROTATION to 224 (to allow the following value)
+- set TABLE_STOPS_PER_ROTATION to 32
+- set TABLE_CENTER_DISTANCE_FROM_SENSOR_CM to 7.2
+*/
+// #define USE_HARDCODED_DISTANCES
+
+/*
 Constants.
 */
 
@@ -59,6 +67,10 @@ double readDistance_mm()
   delay(SENSOR_TIMING_BUDGET_MS);
   double distance_mm = distanceSensor.ranging_data.range_status == VL53L1_RANGESTATUS_RANGE_VALID ? distanceSensor.ranging_data.range_mm : INFINITY;
   // log("%.2f (%s)\n", distance_mm, VL53L1X::rangeStatusToString(distanceSensor.ranging_data.range_status));
+#elif defined(USE_HARDCODED_DISTANCES)
+  static double distances[] = { 4.7, 4.65, 4.5, 4.25, 3.65, 4.25, 4.5, 4.65, 4.7, 4.65, 4.5, 4.25, 3.65, 4.15, 8.9, 8.75, 8.8, 8.75, 8.9, 4.15, 3.65, 4.25, 4.5, 4.65, 4.7, 4.65, 4.5, 4.25, 3.65, 4.25, 4.5, 4.65 };
+  static int distanceIndex = 0;
+  double distance_mm = distanceIndex < sizeof(distances) / sizeof(*distances) ? distances[distanceIndex++] * 10 : INFINITY;
 #else
   double distance_mm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM * 10 / 2 + (-5 + ((double)rand() / RAND_MAX) * TABLE_CENTER_DISTANCE_FROM_SENSOR_CM * 10 / 20);
 #endif
