@@ -58,15 +58,18 @@ void advanceTableThenEmitVertex()
   double y = TOWER_LIMIT_CM * numberOfCompletedTowerStops / TOWER_LIMIT_STOPS;
 
   double distance_cm = readDistance_mm() / 10;
-  double radius_cm = distance_cm - TABLE_CENTER_DISTANCE_FROM_SENSOR_CM;
+  double radius_cm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM - distance_cm;
+
+  /* We need a better solution for this. */
+  if (isinf(distance_cm)) {
+    radius_cm = 0;
+    state = RESETTING; /* Stop after this rotation. */
+  }
+  
   double x = radius_cm * cos(theta);
   double z = radius_cm * sin(theta);
 
 #ifdef MODEL_POINT_CLOUD
-  /* We need a better solution for this if we're not using the point cloud algorithm. */
-  if (isinf(distance_cm))
-    return;
-
   double inradius = POINT_CLOUD_POINT_SIZE_CM * sin(M_PI / 6);
   double halfEdgeLength = POINT_CLOUD_POINT_SIZE_CM * cos(M_PI / 6);
 
