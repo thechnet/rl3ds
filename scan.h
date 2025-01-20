@@ -12,7 +12,6 @@ Constants.
 #define POINT_CLOUD_POINT_SIZE_CM ((double)0.25)
 
 #define TABLE_STOPS_PER_ROTATION 50
-#define TABLE_STOP_DELAY_MS 20 /* Also consider SENSOR_TIMING_BUDGET_MS in sensor.h. */
 #define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)14)
 
 #define TOWER_HEIGHT_CM ((double)15) /* The full height of the tower. (!) This is only used to calculate vertex coordinates. The physical size of the tower is given as TOWER_HEIGHT_IN_STEPS in motors.h. */
@@ -52,8 +51,6 @@ void advanceTableThenEmitVertex()
 
   tableAdvanceToNextStop();
   ++numberOfVisitedTableStopsInThisRotation;
-
-  delay(TABLE_STOP_DELAY_MS); /* Give the distance sensor some time. */
 
   /* Emit vertex. */
 

@@ -7,7 +7,7 @@
 Constants.
 */
 
-#define SENSOR_TIMING_BUDGET_MS 50 /* How long the sensor is allowed to take for a measurement. Minimum in short mode is 20 ms. */
+#define SENSOR_TIMING_BUDGET_MS 300 /* How long the sensor is allowed to take for a measurement. Minimum in short mode is 20 ms. */
 #define SENSOR_PERIOD_MS SENSOR_TIMING_BUDGET_MS /* The inter-measurement period. Minimum is the timing budget. */
 
 /*
@@ -56,6 +56,7 @@ double readDistance_mm()
 {
 #ifdef USE_VL53L1X
   distanceSensor.read(); /* Fetch the latest measurement. */
+  delay(SENSOR_TIMING_BUDGET_MS);
   double distance_mm = distanceSensor.ranging_data.range_status == VL53L1_RANGESTATUS_RANGE_VALID ? distanceSensor.ranging_data.range_mm : INFINITY;
   // log("%.2f (%s)\n", distance_mm, VL53L1X::rangeStatusToString(distanceSensor.ranging_data.range_status));
 #else
