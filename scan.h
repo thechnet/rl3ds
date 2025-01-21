@@ -144,6 +144,7 @@ void scan()
     towerMotorAdvanceToNextStop();
   }
 
+  flush();
   closeResultFile();
 
   state = RESETTING;

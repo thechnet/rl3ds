@@ -16,6 +16,7 @@ Dependencies.
 Constants.
 */
 
+#define BUFFER_CAPACITY 12000
 #define PIN_SD 8
 #define RESULT_FILE_NAME "scan.obj" // TODO: Maybe use the date and time here.
 
@@ -27,9 +28,41 @@ Globals.
 File resultFile;
 #endif
 
+char buffer[BUFFER_CAPACITY];
+int bufferTail;
+
 /*
 Functions.
 */
+
+void flush()
+{
+#ifdef ARDUINO
+#ifndef NO_SD
+  resultFile.print(buffer);
+#endif
+#else
+  printf("%s", buffer);
+#endif
+  // log(buffer);
+
+  bufferTail = 0;
+  buffer[bufferTail] = '\0';
+}
+
+void emit(const char *format, ...)
+{
+  char text[256];
+  va_list args;
+  va_start(args, format);
+  int charsWritten = vsnprintf(text, sizeof(text), format, args);
+  va_end(args);
+
+  if ((BUFFER_CAPACITY - 1) - bufferTail <= charsWritten)
+    flush();
+  strcpy(buffer + bufferTail, text);
+  bufferTail += charsWritten;
+}
 
 void setupStorage()
 {
@@ -42,6 +75,8 @@ void setupStorage()
     fail(FAIL_SD);
   }
 #endif
+
+  flush();
 }
 
 void openResultFile()
@@ -64,21 +99,4 @@ void closeResultFile()
 #if defined(ARDUINO) && !defined(NO_SD)
   resultFile.close();
 #endif
-}
-
-void emit(const char *format, ...)
-{
-  char text[256];
-  va_list args;
-  va_start(args, format);
-  vsnprintf(text, sizeof(text), format, args);
-  va_end(args);
-#ifdef ARDUINO
-#ifndef NO_SD
-  resultFile.print(text);
-#endif
-#else
-  printf("%s", text);
-#endif
-  // log(text);
 }
