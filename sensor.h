@@ -17,6 +17,7 @@ Constants.
 
 #define SENSOR_TIMING_BUDGET_MS 300 /* How long the sensor is allowed to take for a measurement. Minimum in short mode is 20 ms. */
 #define SENSOR_PERIOD_MS SENSOR_TIMING_BUDGET_MS /* The inter-measurement period. Minimum is the timing budget. */
+#define TABLE_RADIUS_WITH_TOLERANCE_CM ((double)6)
 
 /*
 Dependencies.
@@ -66,6 +67,8 @@ double readDistance_mm()
   distanceSensor.read(); /* Fetch the latest measurement. */
   delay(SENSOR_TIMING_BUDGET_MS);
   double distance_mm = distanceSensor.ranging_data.range_status == VL53L1_RANGESTATUS_RANGE_VALID ? distanceSensor.ranging_data.range_mm : INFINITY;
+  if (distance_mm > (TABLE_CENTER_DISTANCE_FROM_SENSOR_CM + TABLE_RADIUS_WITH_TOLERANCE_CM) * 10)
+    distance_mm = INFINITY;
   // log("%.2f (%s)\n", distance_mm, VL53L1X::rangeStatusToString(distanceSensor.ranging_data.range_status));
 #elif defined(USE_HARDCODED_DISTANCES)
   static double distances[] = { 4.7, 4.65, 4.5, 4.25, 3.65, 4.25, 4.5, 4.65, 4.7, 4.65, 4.5, 4.25, 3.65, 4.15, 8.9, 8.75, 8.8, 8.75, 8.9, 4.15, 3.65, 4.25, 4.5, 4.65, 4.7, 4.65, 4.5, 4.25, 3.65, 4.25, 4.5, 4.65 };
