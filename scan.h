@@ -9,15 +9,15 @@ Constants.
 */
 
 #define MODEL_POINT_CLOUD
-#define POINT_CLOUD_POINT_SIZE_CM ((double)0.1)
+#define POINT_CLOUD_POINT_SIZE_CM ((double)0.25)
 
-#define TABLE_STOPS_PER_ROTATION 50
+#define TABLE_STOPS_PER_ROTATION 20
 #define TABLE_CENTER_DISTANCE_FROM_SENSOR_CM ((double)7.5)
 
 #define TOWER_HEIGHT_CM ((double)11.5) /* The full height of the tower. (!) This is only used to calculate vertex coordinates. The physical size of the tower is given as TOWER_HEIGHT_IN_STEPS in motors.h. */
 #define TOWER_LIMIT_CM ((double)11.5) /* The (actual!) height limit of the scan. */
 static_assert(TOWER_LIMIT_CM <= TOWER_HEIGHT_CM);
-#define TOWER_HEIGHT_STOPS 30 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
+#define TOWER_HEIGHT_STOPS 20 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
 #define TOWER_LIMIT_STOPS ((int)((double)TOWER_HEIGHT_STOPS * TOWER_LIMIT_CM / TOWER_HEIGHT_CM))
 #define TOWER_LOWER_DELAY_PER_STOP_MS 0
 
