@@ -15,7 +15,7 @@ While using this, change the following values to match the configuration used to
 Constants.
 */
 
-#define SENSOR_TIMING_BUDGET_MS 300 /* How long the sensor is allowed to take for a measurement. Minimum in short mode is 20 ms. */
+#define SENSOR_TIMING_BUDGET_MS 50 /* How long the sensor is allowed to take for a measurement. Minimum in short mode is 20 ms. */
 #define SENSOR_PERIOD_MS SENSOR_TIMING_BUDGET_MS /* The inter-measurement period. Minimum is the timing budget. */
 #define TABLE_RADIUS_WITH_TOLERANCE_CM ((double)6)
 
