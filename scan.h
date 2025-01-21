@@ -18,7 +18,7 @@ Constants.
 #define TOWER_LIMIT_CM ((double)15) /* The (actual!) height limit of the scan. */
 static_assert(TOWER_LIMIT_CM <= TOWER_HEIGHT_CM);
 #define TOWER_HEIGHT_STOPS 30 /* How often the sensor moves up during a scan up to TOWER_HEIGHT_CM. (!) The number of scanned disks is one larger. */
-#define TOWER_LIMIT_STOPS ((int)(TOWER_HEIGHT_STOPS * TOWER_LIMIT_CM / TOWER_HEIGHT_CM))
+#define TOWER_LIMIT_STOPS ((int)((double)TOWER_HEIGHT_STOPS * TOWER_LIMIT_CM / TOWER_HEIGHT_CM))
 #define TOWER_LOWER_DELAY_PER_STOP_MS 0
 
 #undef M_PI
@@ -97,7 +97,7 @@ void advanceTableThenEmitVertex()
   /* Slanted side. */
   emit("f %d %d %d\n", firstNewVertex + 1, firstNewVertex + 2, firstNewVertex + 3);
 #else
-  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x, z, y);
+  emit("v " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT " " VERTEX_COMPONENT_FORMAT "\n", x, y, z);
 #endif
 }
 
@@ -144,6 +144,8 @@ void scan()
     towerMotorAdvanceToNextStop();
   }
 
+  closeResultFile();
+
   state = RESETTING;
   showState();
 
@@ -152,6 +154,4 @@ void scan()
     towerMotorAdvanceToNextStop();
     delay(TOWER_LOWER_DELAY_PER_STOP_MS);
   }
-
-  closeResultFile();
 }

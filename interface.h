@@ -107,7 +107,7 @@ void log(const char *format, ...)
 
 void showState()
 {
-  byte (*bitmap)[12];
+  byte (*bitmap)[12] = bitmapIdle;
   switch (state) {
   case IDLE:        bitmap = bitmapIdle;       break;
   case SCANNING:    bitmap = bitmapScanning;   break;
