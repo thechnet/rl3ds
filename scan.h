@@ -8,6 +8,8 @@ Dependencies.
 Constants.
 */
 
+// #define STOP_ON_INFINITE_DISTANCE
+
 #define MODEL_POINT_CLOUD
 #define POINT_CLOUD_POINT_SIZE_CM ((double)0.25)
 
@@ -60,11 +62,14 @@ void advanceTableThenEmitVertex()
   double distance_cm = readDistance_mm() / 10;
   double radius_cm = TABLE_CENTER_DISTANCE_FROM_SENSOR_CM - distance_cm;
 
+#ifdef STOP_ON_INFINITE_DISTANCE
   /* We need a better solution for this. */
   if (isinf(distance_cm)) {
+    log("Resetting: Infinite distance measured.\n");
     radius_cm = 0;
     state = RESETTING; /* Stop after this rotation. */
   }
+#endif
   
   double x = radius_cm * cos(theta);
   double z = radius_cm * sin(theta);
